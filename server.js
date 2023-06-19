@@ -29,6 +29,7 @@ app.post("/api/notes", (req, res) => {
       console.log(req.body);
       const parsedData = JSON.parse(data);
       const newNote = req.body;
+      req.body.id = parsedData.length + 1;
       parsedData.push(newNote);
 
       fs.writeFile("./db/db.json", JSON.stringify(parsedData), (err) => {
@@ -37,6 +38,35 @@ app.post("/api/notes", (req, res) => {
           res.status(500).json({ error: "Internal Server Error" });
         } else {
           res.json(newNote);
+        }
+      });
+    }
+  });
+});
+
+app.delete("/api/notes/:id", (req, res) => {
+  fs.readFile("./db/db.json", "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+      res.status(500).json({ error: "Internal Server Error" });
+    } else {
+      console.log(req.params.id);
+      const parsedData = JSON.parse(data);
+      const newNoteArray = [];
+      for (let i = 0; i < parsedData.length; i++) {
+        // console.log(parsedData[i]);
+        if (req.params.id != parsedData[i].id) {
+          //   console.log(parsedData[i]);
+          newNoteArray.push(parsedData[i]);
+        }
+        console.log("New Note: ", newNoteArray);
+      }
+      fs.writeFile("./db/db.json", JSON.stringify(newNoteArray), (err) => {
+        if (err) {
+          console.error(err);
+          res.status(500).json({ error: "Internal Server Error" });
+        } else {
+          res.json(newNoteArray);
         }
       });
     }
